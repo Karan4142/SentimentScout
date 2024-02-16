@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Comments Extractor</title>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script> 
+    
+</head>
+<body>
+    <h2>YouTube Comments Extractor</h2>
+    <form method="POST" action="/" onsubmit="showLoadingPanel();" id="youtube-form">
+        <label for="video_url">YouTube Video URL:</label>
+        <input type="text" name="video_url" hint="url" required>
+        <button type="submit">Get Comments</button>
+    </form>
+    <div id="loading-panel" style="display: none;">
+        <p>Please wait, processing...</p>
+    </div>
+    <div id="chart-container" {% if show_chart_container %}style="display: block;"{% else %}style="display: none;"{% endif %} class="chart-container">
+        <!-- Sentiment Pie Chart -->
+        <div class="chart">
+            <img src="{{ url_for('static', filename='images/sentiment_pie_chart.png') }}" alt="Sentiment Pie Chart">
+            <p>Sentiment Distribution</p>
+        </div>
+    
+        <!-- Top Positive Keywords Bar Chart -->
+        <div class="chart">
+            <img src="{{ url_for('static', filename='images/top_positive_keywords_bar_chart.png') }}" alt="Top Positive Keywords Bar Chart">
+            <p>Top Keywords in Positive Sentiment</p>
+        </div>
+    
+        <!-- Top Negative Keywords Bar Chart -->
+        <div class="chart">
+            <img src="{{ url_for('static', filename='images/top_negative_keywords_bar_chart.png') }}" alt="Top Negative Keywords Bar Chart">
+            <p>Top Keywords in Negative Sentiment</p>
+        </div>
+        <!-- Display sentiment over time plot -->
+        <div class="chart">
+            <img src="{{ url_for('static', filename='images/sentiment_over_time.png') }}" alt="Sentiment Over Time Plot">
+            <p>Sentiment Over Time</p>
+        </div>
+    </div>
+
+    {% if comments %}
+        <h3>Top Comments:</h3>
+        <ol>
+            {% for comment in comments %}
+                <li>{{ comment['text'] }}</li>
+            {% endfor %}
+        </ol>
+        <p>Download CSV: <a href="{{ url_for('download_csv', csv_filename='comments.csv') }}">Download</a></p>
+    {% endif %}
+    
+       
+</body>
+</html>
