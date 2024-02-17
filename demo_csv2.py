@@ -1,6 +1,6 @@
 from collections import Counter
-from flask import Flask, render_template, request, send_file
-from flask import render_template_string
+from flask import Flask, render_template, request, send_file , session
+from flask import render_template_string, redirect, url_for
 from bs4 import BeautifulSoup
 from datetime import datetime
 from nltk.corpus import stopwords
@@ -11,11 +11,14 @@ import matplotlib.dates as mdates
 import csv
 import re
 import nltk
+import secrets
 import matplotlib.pyplot as plt 
 import numpy as np 
 import pandas as pd
 
 app = Flask(__name__)
+secret_key = secrets.token_hex(16)
+app.secret_key = secret_key
 
 # Download NLTK resources
 nltk.download('punkt')
@@ -26,8 +29,28 @@ nltk.download('stopwords')
 sia = SentimentIntensityAnalyzer()
 stop_words = set(stopwords.words('english'))
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/')
 def home():
+    return render_template('home.html')
+
+# Login route
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        # Check login credentials (you can replace this with your own logic)
+        if request.form['username'] == 'Karan' and request.form['password'] == '12345':
+            # Set session variable to indicate user is logged in
+            session['logged_in'] = True
+            # Redirect to home_with_sentiment.html
+            return redirect(url_for('home_with_sentiment'))
+    
+    return render_template('login.html')
+
+@app.route('/home_with_sentiment', methods=['GET', 'POST'])
+def home_with_sentiment():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+
     if request.method == 'POST':
         video_url = request.form['video_url']
         comments = get_youtube_comments(video_url)
@@ -53,6 +76,11 @@ def home():
         return render_template('home_with_sentiment.html', comments=comments, csv_filename=csv_filename, show_chart_container=True)  
 
     return render_template('home_with_sentiment.html')
+
+# About page
+@app.route('/about', methods=['GET'])
+def about():
+    return render_template('about.html')
 
 def remove_emojis(text):
     # Emoji pattern to remove emojis from the text

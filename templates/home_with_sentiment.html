@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YouTube Comments Extractor</title>
+    <title>Sentiment Scout</title>
     <script src="{{ url_for('static', filename='js/script.js') }}"></script> 
     
 </head>
 <body>
-    <h2>YouTube Comments Extractor</h2>
-    <form method="POST" action="/" onsubmit="showLoadingPanel();" id="youtube-form">
+    <h2>Youtube Comment Analyser</h2>
+    <form method="POST" action="{{ url_for('home_with_sentiment') }}" onsubmit="showLoadingPanel();" id="youtube-form">
         <label for="video_url">YouTube Video URL:</label>
         <input type="text" name="video_url" hint="url" required>
         <button type="submit">Get Comments</button>
