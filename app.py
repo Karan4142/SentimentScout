@@ -1,11 +1,17 @@
 from collections import Counter
-from flask import Flask, render_template, request, send_file , session
-from flask import render_template_string, redirect, url_for
+from flask import Flask, render_template, request, send_file , session, flash
+from flask import redirect, url_for
 from bs4 import BeautifulSoup
 from datetime import datetime
+from flask_wtf import FlaskForm
+from wtforms import StringField,PasswordField,SubmitField
+from wtforms.validators import DataRequired, Email, ValidationError
+from flask_mysqldb import MySQL
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.sentiment.vader import SentimentIntensityAnalyzer 
+import email_validator
+import bcrypt
 import requests
 import matplotlib.dates as mdates
 import csv
@@ -18,7 +24,34 @@ import pandas as pd
 
 app = Flask(__name__)
 secret_key = secrets.token_hex(16)
+
+# MySQL Configuration
+app.config['MYSQL_HOST'] = 'aws-demo.cb6wyouss3ie.eu-north-1.rds.amazonaws.com'
+app.config['MYSQL_USER'] = 'admin'
+app.config['MYSQL_PASSWORD'] = 'Karan4142'
+app.config['MYSQL_DB'] = 'User'
 app.secret_key = secret_key
+
+mysql = MySQL(app)
+
+class RegisterForm(FlaskForm):
+    name = StringField("Name",validators=[DataRequired()])
+    email = StringField("Email",validators=[DataRequired(), Email()])
+    password = PasswordField("Password",validators=[DataRequired()])
+    submit = SubmitField("Register")
+
+    def validate_email(self,field):
+        cursor = mysql.connection.cursor()
+        cursor.execute("SELECT * FROM User_table where email=%s",(field.data,))
+        user = cursor.fetchone()
+        cursor.close()
+        if user:
+            raise ValidationError('Email Already Taken')
+
+class LoginForm(FlaskForm):
+    email = StringField("Email",validators=[DataRequired(), Email()])
+    password = PasswordField("Password",validators=[DataRequired()])
+    submit = SubmitField("Login")
 
 # Download NLTK resources
 nltk.download('punkt')
@@ -31,26 +64,57 @@ stop_words = set(stopwords.words('english'))
 
 @app.route('/')
 def home():
-    return render_template('home.html')
+    return render_template('index.html')
+
+@app.route('/register',methods=['GET','POST'])
+def register():
+    form = RegisterForm()
+    if form.validate_on_submit():
+        name = form.name.data
+        email = form.email.data
+        password = form.password.data
+
+        hashed_password = bcrypt.hashpw(password.encode('utf-8'),bcrypt.gensalt())
+
+        # store data into database 
+        cursor = mysql.connection.cursor()
+        cursor.execute("INSERT INTO User_table (username,password,email) VALUES (%s,%s,%s)",(name,hashed_password,email))
+        mysql.connection.commit()
+        cursor.close()
+
+        return redirect(url_for('login'))
+
+    return render_template('register_test.html',form=form)
 
 # Login route
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if request.method == 'POST':
-        # Check login credentials (you can replace this with your own logic)
-        if request.form['username'] == 'Karan' and request.form['password'] == '12345':
-            # Set session variable to indicate user is logged in
-            session['logged_in'] = True
-            # Redirect to home_with_sentiment.html
-            return redirect(url_for('home_with_sentiment'))
-    
-    return render_template('login.html')
+    form = LoginForm()
+    if form.validate_on_submit():
+        email = form.email.data
+        password = form.password.data
+
+        cursor = mysql.connection.cursor()
+        cursor.execute("SELECT * FROM User_table WHERE email=%s",(email,))
+        user = cursor.fetchone()
+        cursor.close()
+        if user and bcrypt.checkpw(password.encode('utf-8'), user[2].encode('utf-8')):
+            session['user_id'] = user[0]
+            return render_template('home_with_sentiment.html',form=form)
+        else:
+            flash("Login failed. Please check your email and password")
+            return redirect(url_for('login'))
+
+    return render_template('login_test.html',form=form)
+
+@app.route('/logout')
+def logout():
+    session.pop('user_id', None)
+    flash("You have been logged out successfully.")
+    return redirect(url_for('login'))
 
 @app.route('/home_with_sentiment', methods=['GET', 'POST'])
 def home_with_sentiment():
-    if not session.get('logged_in'):
-        return redirect(url_for('login'))
-
     if request.method == 'POST':
         video_url = request.form['video_url']
         comments = get_youtube_comments(video_url)
