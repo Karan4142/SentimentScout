@@ -64,7 +64,7 @@ stop_words = set(stopwords.words('english'))
 
 @app.route('/')
 def home():
-    return render_template('index.html')
+    return render_template('testing.html')
 
 @app.route('/register',methods=['GET','POST'])
 def register():
