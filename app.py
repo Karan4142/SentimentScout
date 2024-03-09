@@ -19,6 +19,7 @@ import nltk
 import secrets
 import matplotlib.pyplot as plt 
 import numpy as np 
+import pandas as pd
 
 app = Flask(__name__)
 secret_key = secrets.token_hex(16)
@@ -292,16 +293,15 @@ def create_bar_chart(top_keywords, title, max_keywords=10):
     plt.close()
 
 def create_pie_chart(sentiment_data):
-    labels = sentiment_data.keys()
-    sizes = sentiment_data.values()
+  labels = sentiment_data.keys()
+  sizes = sentiment_data.values()
 
-    plt.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90, colors=['#4CAF50', '#FF5733', '#808080'])
-    plt.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
-    plt.title('Sentiment Distribution')
-    plt.tight_layout()
-
-    plt.savefig('static/images/sentiment_pie_chart.png')  # Save the chart as an image
-    plt.close()
+  plt.pie(sizes, labels=labels,autopct='%1.1f%%',startangle=90,colors=['#4CAF50', '#FF5733', '#808080'])
+  plt.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+  plt.title('Sentiment Distribution')
+  plt.tight_layout()
+  plt.savefig('static/images/sentiment_pie_chart.png')  # Save the chart as an image
+  plt.close()
 
 def create_time_series_plot(comments):
     time_series_data = {'Positive': [], 'Negative': [], 'Neutral': []}
