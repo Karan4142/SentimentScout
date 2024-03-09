@@ -71,18 +71,22 @@
     color: #333;
     font-weight: 600;
   }
-  .wrapper .register-link{
+  .wrapper .login-link{
     font-size: 14.5px;
     text-align: center;
     margin: 20px 0 15px;
   
   }
-  .register-link p a{
+  .login-link p a{
     color: #fff;
     text-decoration: none;
     font-weight: 600;
   }
-  .register-link p a:hover{
+  .login-link p a:hover{
     text-decoration: underline;
+  }
+
+  .text-danger{
+    color: #d40d0d;
   }
 

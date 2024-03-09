@@ -1,31 +1,186 @@
-body {
-    font-family: sans-serif;
+@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@400;600;700&family=Lexend+Deca:wght@100;200;300;400;500;600;700&family=Montserrat:wght@400;700&family=Mulish:wght@300&family=Poppins:wght@300;400;600&family=Urbanist:wght@300;400;600;700;800;900&display=swap');
+
+
+*{
     margin: 0;
     padding: 0;
-  }
-  
-  .hero {
-    color: #fff;
-    text-align: center;
-    height: 100vh;
-    overflow-y: scroll; /* Add scrollbar */
-  }
-  
-  .hero h1 {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-  }
-  
-  .hero p {
-    font-size: 1.2rem;
-    margin-bottom: 2rem;
-  }
-  
-  .btn-primary {
-    background-color: #3b5998;
-    border-color: #3b5998;
-  }
-  
-  .navbar-brand img {
-    max-width: 100px; 
-  }  
+    box-sizing: border-box;
+
+    font-family: "Urbanist", sans-serif;
+}
+
+:root{
+    --bs-dark-color: #1a1d20;
+    --bs-dark-primary:#1c1c1c;
+    --bs-dark-primary2:#000000;
+    --bs-main-color:#fff;
+    --bs-primary-color:#c6c6c6;
+    --secondary-color: #29a9fd;
+    --bs-supporting-color: #C850C0;
+}
+
+h1, h2,h3,h4,h5{
+    font-family: 'Lexend Deca', sans-serif;
+    color: var( --bs-dark-color);
+}
+
+h1{
+    font-size: 3.8rem;
+}
+
+h2{
+    line-height: 3rem;
+    font-weight: 600;
+    font-size: 3.4rem;
+}
+
+p{
+    margin: 0;
+    font-weight: 400;
+    font-size: 1rem;
+    color: var( --bs-primary-color);
+    letter-spacing: 0.07rem;
+    line-height: 1.55rem;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+}
+
+a{
+    text-decoration: none;
+}
+
+.bg-main{
+    height: 90vh;
+    position: relative;
+}
+
+.bg-color{
+    background-image: linear-gradient(to right,rgb(9, 9, 9), rgb(18, 18, 18),rgb(34, 34, 34))
+   
+}
+
+.bg-color2{
+    
+    background-color: var(--bs-dark-primary2);
+}
+
+.bg-theme{
+
+    color: var( --bs-supporting-color);
+    background-image: none!important;
+}
+
+.nav-link{
+    color: var(--bs-main-color)!important;
+    font-weight: bold;
+}
+
+.fa-star{
+    color: var( --bs-supporting-color);
+}
+
+
+
+.nav-link:hover{
+    color: var(--secondary-color) !important;
+}
+
+/* 
+hero section starts here */
+
+.hero-section .container{
+    display:grid;
+    place-items: center;
+    height: inherit;
+}
+.hero-section h1{
+    font-size: 3.1rem;
+}
+.hero-section h4{
+  color: var( --bs-primary-color);
+}
+
+/*shape divider start */
+
+.custom-shape-divider-bottom-1684208460 {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    overflow: hidden;
+    line-height: 0;
+    transform: rotate(180deg);
+}
+
+.custom-shape-divider-bottom-1684208460 svg {
+    position: relative;
+    display: block;
+    width: calc(100% + 1.3px);
+    height: 150px;
+}
+
+.custom-shape-divider-bottom-1684208460 .shape-fill {
+    fill: var( --bs-main-color);
+}
+
+/*shape dividers end */
+/*footer styling */
+.main-footer-section{
+    padding: 0 0 4rem 0;
+       
+       color: var( --bs-main-color);
+}
+
+.services-section{
+    padding: 6rem 0 3rem 0!important;
+}
+
+
+.para-width{
+    width: 55ch;
+}
+
+.text-grey{
+    color:#00000080;
+}
+
+.text-light-grey{
+    color:var(--bs-primary-color);
+}
+
+.card-title{
+    font-weight: 500;
+    letter-spacing: .05rem;
+}
+
+.common-heading{
+    font-size: 2.8rem;
+    font-weight: 500;
+    letter-spacing: 0.01rem!important;
+}
+
+.common-title {
+    margin-bottom: 4.2rem;
+}
+
+.card-box:hover{
+    box-shadow: rgba(149, 157, 165, 0.2) 0 8px 24px;
+}
+
+.services-section .card-box{
+    padding: 4rem  2.4rem 3rem!important;
+    border-radius: .5rem!important;
+}
+.chart-container .chart{
+    justify-content: center;
+
+
+}
+
+
+
+   
+
+   
+
+   

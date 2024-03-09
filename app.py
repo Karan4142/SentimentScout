@@ -64,7 +64,7 @@ stop_words = set(stopwords.words('english'))
 
 @app.route('/')
 def home():
-    return render_template('testing.html')
+    return render_template('home.html')
 
 @app.route('/register',methods=['GET','POST'])
 def register():
@@ -84,7 +84,7 @@ def register():
 
         return redirect(url_for('login'))
 
-    return render_template('register_test.html',form=form)
+    return render_template('register.html',form=form)
 
 # Login route
 @app.route('/login', methods=['GET', 'POST'])
@@ -100,18 +100,18 @@ def login():
         cursor.close()
         if user and bcrypt.checkpw(password.encode('utf-8'), user[2].encode('utf-8')):
             session['user_id'] = user[0]
-            return render_template('home_with_sentiment.html',form=form)
+            return redirect('home_with_sentiment')
         else:
             flash("Login failed. Please check your email and password")
             return redirect(url_for('login'))
 
-    return render_template('login_test.html',form=form)
+    return render_template('login.html',form=form)
 
 @app.route('/logout')
 def logout():
     session.pop('user_id', None)
     flash("You have been logged out successfully.")
-    return redirect(url_for('login'))
+    return redirect(url_for('home'))
 
 @app.route('/home_with_sentiment', methods=['GET', 'POST'])
 def home_with_sentiment():
@@ -141,10 +141,7 @@ def home_with_sentiment():
 
     return render_template('home_with_sentiment.html')
 
-# About page
-@app.route('/about', methods=['GET'])
-def about():
-    return render_template('about.html')
+
 
 def remove_emojis(text):
     # Emoji pattern to remove emojis from the text
@@ -218,7 +215,9 @@ def get_sentiment_distribution(comments):
 def preprocess_comment(comment):
     comment['text'] = remove_emojis(comment['text'])
     comment['text'] = remove_stopwords(comment['text'].lower())
-    comment['text'] = re.sub(r'<br>', '', comment['text'])  # Remove <br>
+    comment['text'] = re.sub(r'<br>', '', comment['text'])
+    comment['text'] = re.sub(r'https', '', comment['text'])  
+    comment['text'] = re.sub(r'http', '', comment['text']) 
     comment['text'] = re.sub(r'br', '', comment['text'])  # Remove br
     comment['text'] = re.sub(r'\b\d+\b', '', comment['text'])  # Remove numeric values
 
@@ -230,7 +229,7 @@ def preprocess_comment(comment):
     
     return comment
 
-def get_youtube_comments(video_url, max_comments=100):
+def get_youtube_comments(video_url, max_comments=250):
     video_id = video_url.split('v=')[1]
     api_url = f'https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&videoId={video_id}&key=AIzaSyCvgehl8JBssaajbrGxOMHJIImUEQVeUN8'
     
