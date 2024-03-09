@@ -20,7 +20,7 @@ import nltk
 import secrets
 import matplotlib.pyplot as plt 
 import numpy as np 
-import pandas as pd
+
 
 app = Flask(__name__)
 secret_key = secrets.token_hex(16)
