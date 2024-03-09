@@ -1,0 +1,9 @@
+Flask
+gunicorn
+requests
+nltk
+matplotlib
+flask-WTF
+bcrypt  
+WTForms 
+Flask-MySQLdb
