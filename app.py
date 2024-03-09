@@ -11,6 +11,7 @@ from nltk.tokenize import word_tokenize
 from nltk.sentiment.vader import SentimentIntensityAnalyzer 
 import bcrypt
 import requests
+import email_validator
 import matplotlib.dates as mdates
 import csv
 import re

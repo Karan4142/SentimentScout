@@ -7,3 +7,4 @@ flask-WTF
 bcrypt  
 WTForms 
 Flask-MySQLdb
+email_validator
