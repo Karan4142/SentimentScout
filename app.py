@@ -1,7 +1,6 @@
 from collections import Counter
 from flask import Flask, render_template, request, send_file , session, flash
 from flask import redirect, url_for
-from bs4 import BeautifulSoup
 from datetime import datetime
 from flask_wtf import FlaskForm
 from wtforms import StringField,PasswordField,SubmitField
@@ -10,7 +9,6 @@ from flask_mysqldb import MySQL
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.sentiment.vader import SentimentIntensityAnalyzer 
-import email_validator
 import bcrypt
 import requests
 import matplotlib.dates as mdates
@@ -20,7 +18,6 @@ import nltk
 import secrets
 import matplotlib.pyplot as plt 
 import numpy as np 
-import pandas as pd
 
 app = Flask(__name__)
 secret_key = secrets.token_hex(16)
