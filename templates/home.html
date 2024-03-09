@@ -40,6 +40,19 @@
         </nav>
         <!-- hero section start -->
         <section class="bg-main bg-color hero-section">
+            <div class="wrapper">
+                {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div class="alert alert-danger">
+                        <ul>
+                            {% for message in messages %}
+                            <li>{{ message }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+                {% endwith %}
+            </div>
             <div class="container">
                 <div class="row">
                     <div class="d-flex flex-column align-items-start justify-content-center col-xl-6 xol-lg-6 col-md-12 col-12 order-1 order-lg-0 text-md-start text-center">

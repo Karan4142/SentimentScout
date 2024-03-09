@@ -1,4 +1,5 @@
 from collections import Counter
+from linecache import cache
 from flask import Flask, render_template, request, send_file , session, flash
 from flask import redirect, url_for
 from datetime import datetime
@@ -32,6 +33,12 @@ app.config['MYSQL_DB'] = 'User'
 app.secret_key = secret_key
 
 mysql = MySQL(app)
+
+
+def is_valid_youtube_url(url):
+    # YouTube video URL pattern
+    pattern = r'^https?:\/\/(?:www\.)?youtube\.com\/watch\?v=[\w-]+(?:\&[\w\-=]*)?(?:\&ab_channel=[\w-]+)?$'
+    return re.match(pattern, url) is not None and 'v=' in url and 'ab_channel=' in url
 
 class RegisterForm(FlaskForm):
     name = StringField("Name",validators=[DataRequired()])
@@ -116,6 +123,9 @@ def logout():
 def home_with_sentiment():
     if request.method == 'POST':
         video_url = request.form['video_url']
+        if not is_valid_youtube_url(video_url):
+            flash("Invalid YouTube URL. Please enter a valid YouTube video URL.")
+            return redirect(url_for('home_with_sentiment'))
         comments = get_youtube_comments(video_url)
 
         # Save comments to a CSV file
@@ -352,6 +362,11 @@ def create_time_series_plot(comments):
 def download_csv():
     csv_filename = request.args.get('csv_filename', 'comments.csv')
     return send_file(csv_filename, as_attachment=True)
+
+@app.after_request
+def add_header(response):
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    return response
 
 if __name__ == '__main__':
     app.run(debug=True)
