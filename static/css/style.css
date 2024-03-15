@@ -36,8 +36,8 @@ h2{
 
 p{
     margin: 0;
-    font-weight: 400;
-    font-size: 1rem;
+    font-weight: 500;
+    font-size: 1.1rem;
     color: var( --bs-primary-color);
     letter-spacing: 0.07rem;
     line-height: 1.55rem;
@@ -96,6 +96,8 @@ hero section starts here */
 .hero-section h1{
     font-size: 3.1rem;
 }
+
+
 .hero-section h4{
   color: var( --bs-primary-color);
 }
