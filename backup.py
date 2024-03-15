@@ -121,53 +121,32 @@ def logout():
 
 @app.route('/home_with_sentiment', methods=['GET', 'POST'])
 def home_with_sentiment():
-    if 'user_id' in session:
-        user_id = session['user_id']
-        if request.method == 'POST':
-            video_url = request.form['video_url']
-            if not is_valid_youtube_url(video_url):
-                flash("Invalid YouTube URL. Please enter a valid YouTube video URL.")
-                return redirect(url_for('home_with_sentiment'))
-            with mysql.connection.cursor() as cur:
-                cur.execute("SELECT url_history FROM User_table WHERE id = %s", (user_id,))
-                result = cur.fetchone()
-                if result:
-                    current_url_history = result[0]
-                    if current_url_history:
-                        urls = current_url_history.split(',') if current_url_history else []
-                        if video_url not in urls:
-                            urls.append(video_url)
-                            updated_url_history = ','.join(urls)
-                            cur.execute("UPDATE User_table SET url_history = %s WHERE id = %s", (updated_url_history, user_id))
-                            mysql.connection.commit()
-                            cur.close()
-                    else:
-                        updated_url_history = video_url
-                        cur.execute("UPDATE User_table SET url_history = %s WHERE id = %s", (updated_url_history, user_id))
-                        mysql.connection.commit()
-                        cur.close()
-            comments = get_youtube_comments(video_url)
-            original_comments = [comment['text'] for comment in comments]  # Extracting original comments
+    if request.method == 'POST':
+        video_url = request.form['video_url']
+        if not is_valid_youtube_url(video_url):
+            flash("Invalid YouTube URL. Please enter a valid YouTube video URL.")
+            return redirect(url_for('home_with_sentiment'))
+        comments = get_youtube_comments(video_url)
 
-            # Save comments to a CSV file
-            csv_filename = 'comments.csv'
-            save_comments_to_csv(comments, csv_filename)
+        # Save comments to a CSV file
+        csv_filename = 'comments.csv'
+        save_comments_to_csv(comments, csv_filename)
 
-            # Get sentiment data and top keywords for visualization
-            sentiment_counts, positive_keywords, negative_keywords = get_sentiment_distribution(comments)
+        # Get sentiment data and top keywords for visualization
+        sentiment_counts, positive_keywords, negative_keywords = get_sentiment_distribution(comments)
 
-            # Create a sentiment pie chart
-            create_pie_chart(sentiment_counts)
+        # Create a sentiment pie chart
+        create_pie_chart(sentiment_counts)
 
-            # Create bar charts for top positive and negative keywords
-            create_bar_chart(positive_keywords.most_common(), 'Top Positive Keywords')
-            create_bar_chart(negative_keywords.most_common(), 'Top Negative Keywords')
+        # Create bar charts for top positive and negative keywords
+        create_bar_chart(positive_keywords.most_common(), 'Top Positive Keywords')
+        create_bar_chart(negative_keywords.most_common(), 'Top Negative Keywords')
 
-            # Create sentiment over time plot
-            create_time_series_plot(comments)
+        # Create sentiment over time plot
+        create_time_series_plot(comments)
 
 
-            return render_template('home_with_sentiment.html', comments=original_comments, csv_filename=csv_filename, show_chart_container=True)  
+        return render_template('home_with_sentiment.html', comments=comments, csv_filename=csv_filename, show_chart_container=True)  
 
     return render_template('home_with_sentiment.html')
 
@@ -248,8 +227,6 @@ def preprocess_comment(comment):
     comment['text'] = re.sub(r'<br>', '', comment['text'])
     comment['text'] = re.sub(r'https', '', comment['text'])  
     comment['text'] = re.sub(r'http', '', comment['text']) 
-    comment['text'] = re.sub(r'amp', '', comment['text']) 
-    comment['text'] = re.sub(r'quot', '', comment['text'])
     comment['text'] = re.sub(r'br', '', comment['text'])  # Remove br
     comment['text'] = re.sub(r'\b\d+\b', '', comment['text'])  # Remove numeric values
 

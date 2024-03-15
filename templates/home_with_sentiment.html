@@ -89,18 +89,6 @@
         </div>        
     </section>
 
-    <!-- <div class="container">
-        <h2>Youtube Comment Analyser</h2>
-        <form method="POST" action="{{ url_for('home_with_sentiment') }}" onsubmit="showLoadingPanel();" id="youtube-form">
-            <label for="video_url">YouTube Video URL:</label>
-            <input type="text" name="video_url" hint="url" required>
-            <button type="submit">Get Comments</button>
-        </form>
-        <div id="loading-panel" style="display: none;">
-            <p>Please wait, processing...</p>
-        </div>
-    </div> -->
-
     <section class=" services-section">
         <div class="container text-center common-title fw-bold">
             <h2 class="common-heading">Output Would be generated below </h2>
@@ -143,8 +131,8 @@
     {% if comments %}
         <h3>Top Comments:</h3>
         <ol>
-            {% for comment in comments %}
-                <li>{{ comment['text'] }}</li>
+            {% for comments in comments %}
+                <li>{{ comments }}</li>
             {% endfor %}
         </ol>
         <p>Download Comments: <a href="{{ url_for('download_csv', csv_filename='comments.csv') }}">Download</a></p>
