@@ -171,6 +171,20 @@ def home_with_sentiment():
 
     return render_template('home_with_sentiment.html')
 
+@app.route('/dashboard')
+def dashboard():
+    if 'user_id' in session:
+        user_id = session['user_id']
+        with mysql.connection.cursor() as cur:
+            cur.execute("SELECT username, email, url_history FROM User_table WHERE id = %s", (user_id,))
+            user_data = cur.fetchone()
+            if user_data:
+                username = user_data[0]
+                email = user_data[1]
+                url_history = user_data[2].split(',') if user_data[2] else []
+                return render_template('dashboard.html', username=username, email=email, url_history=url_history)
+    flash('You need to be logged in to access the dashboard.')
+    return redirect(url_for('login'))
 
 
 def remove_emojis(text):
