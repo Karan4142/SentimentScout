@@ -6,12 +6,13 @@
   <title>Login | Sentiment Scout</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/login_style.css') }}">
   <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+  <link rel="icon" type="images/x-icon" href="{{ url_for('static', filename='images/Logo.jpeg') }}" />
 </head>
 <body>
   <div class="wrapper">
     {% with messages = get_flashed_messages() %}
     {% if messages %}
-        <div class="alert alert-danger">
+        <div class="alert-danger">
             <ul>
                 {% for message in messages %}
                 <li>{{ message }}</li>
@@ -26,14 +27,15 @@
       <div class="input-box">
         {{ form.email.label(for="email")}}
         {{ form.email(id="email",placeholder="Email")}}
-  
-        {% if form.email.errors %}
-              <ul>
-                  {% for error in form.email.errors %}
-                      <li>{{ error }}</li>
-                  {% endfor %}
-              </ul>
-        {% endif %}
+        <div class="alert">
+          {% if form.email.errors %}
+          <ul>
+              {% for error in form.email.errors %}
+                  <li>{{ error }}</li>
+              {% endfor %}
+          </ul>
+          {% endif %}
+        </div>
         <i class='bx bxs-user'></i>
       </div>
       <div class="input-box">
@@ -41,7 +43,7 @@
         {{ form.password(id="password" ,placeholder="Password")}}
 
         {% if form.password.errors %}
-                <ul>
+                <ul class="alert">
                     {% for error in form.password.errors %}
                         <li>{{ error }}</li>
                     {% endfor %}
