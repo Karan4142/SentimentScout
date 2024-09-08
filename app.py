@@ -26,10 +26,10 @@ app = Flask(__name__)
 secret_key = secrets.token_hex(16)
 
 # MySQL Configuration
-app.config['MYSQL_HOST'] = 'sentimentscout-1.c308aew2qiwx.ap-south-1.rds.amazonaws.com'
-app.config['MYSQL_USER'] = 'admin'
+app.config['MYSQL_HOST'] = 'localhost'
+app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'Karan4142'
-app.config['MYSQL_DB'] = 'User'
+app.config['MYSQL_DB'] = 'user'
 app.secret_key = secret_key
 
 mysql = MySQL(app)
