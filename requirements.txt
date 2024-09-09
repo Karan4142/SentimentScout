@@ -2,10 +2,10 @@ Flask
 gunicorn
 requests
 nltk
+email_validator
 matplotlib
 flask-WTF
 bcrypt  
 WTForms 
 Flask-SQLAlchemy
 psycopg2-binary
-email_validator
