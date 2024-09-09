@@ -1,4 +1,6 @@
 from collections import Counter
+import psycopg2
+from flask_sqlalchemy import SQLAlchemy
 from linecache import cache
 from flask import Flask, render_template, request, send_file , session, flash
 from flask import redirect, url_for
@@ -6,7 +8,6 @@ from datetime import datetime
 from flask_wtf import FlaskForm
 from wtforms import StringField,PasswordField,SubmitField
 from wtforms.validators import DataRequired, Email, ValidationError
-from flask_mysqldb import MySQL
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.sentiment.vader import SentimentIntensityAnalyzer 
@@ -25,15 +26,29 @@ import numpy as np
 app = Flask(__name__)
 secret_key = secrets.token_hex(16)
 
-# MySQL Configuration
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'Karan4142'
-app.config['MYSQL_DB'] = 'user'
+# # MySQL Configuration
+# app.config['MYSQL_HOST'] = 'localhost'
+# app.config['MYSQL_USER'] = 'root'
+# app.config['MYSQL_PASSWORD'] = 'Karan4142'
+# app.config['MYSQL_DB'] = 'user'
+# app.secret_key = secret_key
+
+# mysql = MySQL(app)
+
+# PostgreSQL Configuration
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres.ogrcdmztxquddwxhugiv:KaranMehta4142%40@aws-0-ap-south-1.pooler.supabase.com:6543/postgres'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = secret_key
 
-mysql = MySQL(app)
+db = SQLAlchemy(app)
 
+class User(db.Model):
+    __tablename__ = 'User_table'
+    id = db.Column(db.BigInteger, primary_key=True)
+    username = db.Column(db.Text, nullable=False)
+    password = db.Column(db.Text, nullable=False)
+    email = db.Column(db.Text)
+    url_history = db.Column(db.Text)
 
 def is_valid_youtube_url(url):
     # YouTube video URL pattern
@@ -47,10 +62,11 @@ class RegisterForm(FlaskForm):
     submit = SubmitField("Register")
 
     def validate_email(self,field):
-        cursor = mysql.connection.cursor()
-        cursor.execute("SELECT * FROM User_table where email=%s",(field.data,))
-        user = cursor.fetchone()
-        cursor.close()
+        # cursor = mysql.connection.cursor()
+        # cursor.execute("SELECT * FROM User_table where email=%s",(field.data,))
+        # user = cursor.fetchone()
+        # cursor.close()
+        user = User.query.filter_by(email=field.data).first()
         if user:
             raise ValidationError('Email Already Taken')
 
@@ -83,10 +99,14 @@ def register():
         hashed_password = bcrypt.hashpw(password.encode('utf-8'),bcrypt.gensalt())
 
         # store data into database 
-        cursor = mysql.connection.cursor()
-        cursor.execute("INSERT INTO User_table (username,password,email) VALUES (%s,%s,%s)",(name,hashed_password,email))
-        mysql.connection.commit()
-        cursor.close()
+        # cursor = mysql.connection.cursor()
+        # cursor.execute("INSERT INTO User_table (username,password,email) VALUES (%s,%s,%s)",(name,hashed_password,email))
+        # mysql.connection.commit()
+        # cursor.close()
+               
+        new_user = User(username=name, password=hashed_password.decode('utf-8'), email=email)
+        db.session.add(new_user)
+        db.session.commit()
 
         return redirect(url_for('login'))
 
@@ -100,12 +120,13 @@ def login():
         email = form.email.data
         password = form.password.data
 
-        cursor = mysql.connection.cursor()
-        cursor.execute("SELECT * FROM User_table WHERE email=%s",(email,))
-        user = cursor.fetchone()
-        cursor.close()
-        if user and bcrypt.checkpw(password.encode('utf-8'), user[2].encode('utf-8')):
-            session['user_id'] = user[0]
+        # cursor = mysql.connection.cursor()
+        # cursor.execute("SELECT * FROM User_table WHERE email=%s",(email,))
+        # user = cursor.fetchone()
+        # cursor.close()
+        user = User.query.filter_by(email=email).first()
+        if user and bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8')):
+            session['user_id'] = user.id
             return redirect('home_with_sentiment')
         else:
             flash("Login failed. Please check your email and password")
@@ -128,24 +149,33 @@ def home_with_sentiment():
             if not is_valid_youtube_url(video_url):
                 flash("Invalid YouTube URL. Please enter a valid YouTube video URL.")
                 return redirect(url_for('home_with_sentiment'))
-            with mysql.connection.cursor() as cur:
-                cur.execute("SELECT url_history FROM User_table WHERE id = %s", (user_id,))
-                result = cur.fetchone()
-                if result:
-                    current_url_history = result[0]
-                    if current_url_history:
-                        urls = current_url_history.split(',') if current_url_history else []
-                        if video_url not in urls:
-                            urls.append(video_url)
-                            updated_url_history = ','.join(urls)
-                            cur.execute("UPDATE User_table SET url_history = %s WHERE id = %s", (updated_url_history, user_id))
-                            mysql.connection.commit()
-                            cur.close()
-                    else:
-                        updated_url_history = video_url
-                        cur.execute("UPDATE User_table SET url_history = %s WHERE id = %s", (updated_url_history, user_id))
-                        mysql.connection.commit()
-                        cur.close()
+            # with mysql.connection.cursor() as cur:
+            #     cur.execute("SELECT url_history FROM User_table WHERE id = %s", (user_id,))
+            #     result = cur.fetchone()
+            #     if result:
+            #         current_url_history = result[0]
+            #         if current_url_history:
+            #             urls = current_url_history.split(',') if current_url_history else []
+            #             if video_url not in urls:
+            #                 urls.append(video_url)
+            #                 updated_url_history = ','.join(urls)
+            #                 cur.execute("UPDATE User_table SET url_history = %s WHERE id = %s", (updated_url_history, user_id))
+            #                 mysql.connection.commit()
+            #                 cur.close()
+            #         else:
+            #             updated_url_history = video_url
+            #             cur.execute("UPDATE User_table SET url_history = %s WHERE id = %s", (updated_url_history, user_id))
+            #             mysql.connection.commit()
+            #             cur.close()
+            user = User.query.get(user_id)
+            if user:
+                urls = user.url_history.split(',') if user.url_history else []
+                if video_url not in urls:
+                    urls.append(video_url)
+                    user.url_history = ','.join(urls)
+                else:
+                    user.url_history = video_url
+                db.session.commit()
             comments = get_youtube_comments(video_url)
             original_comments = [comment['text'] for comment in comments]  # Extracting original comments
 
@@ -175,14 +205,19 @@ def home_with_sentiment():
 def dashboard():
     if 'user_id' in session:
         user_id = session['user_id']
-        with mysql.connection.cursor() as cur:
-            cur.execute("SELECT username, email, url_history FROM User_table WHERE id = %s", (user_id,))
-            user_data = cur.fetchone()
-            if user_data:
-                username = user_data[0]
-                email = user_data[1]
-                url_history = user_data[2].split(',') if user_data[2] else []
-                return render_template('dashboard.html', username=username, email=email, url_history=url_history)
+        # with mysql.connection.cursor() as cur:
+        #     cur.execute("SELECT username, email, url_history FROM User_table WHERE id = %s", (user_id,))
+        #     user_data = cur.fetchone()
+        #     if user_data:
+        #         username = user_data[0]
+        #         email = user_data[1]
+        #         url_history = user_data[2].split(',') if user_data[2] else []
+        user = User.query.get(user_id)
+        if user:
+            username = user.username
+            email = user.email
+            url_history = user.url_history.split(',') if user.url_history else []
+            return render_template('dashboard.html', username=username, email=email, url_history=url_history)
     flash('You need to be logged in to access the dashboard.')
     return redirect(url_for('login'))
 

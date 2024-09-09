@@ -6,5 +6,6 @@ matplotlib
 flask-WTF
 bcrypt  
 WTForms 
-Flask-MySQLdb
+Flask-SQLAlchemy
+psycopg2-binary
 email_validator
