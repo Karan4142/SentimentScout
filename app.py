@@ -76,6 +76,7 @@ class LoginForm(FlaskForm):
     submit = SubmitField("Login")
 
 # Download NLTK resources
+nltk.download('punkt_tab')
 nltk.download('punkt')
 nltk.download('vader_lexicon')
 nltk.download('stopwords')
